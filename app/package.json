@@ -1,0 +1,10 @@
+{
+    "name": "nodejs-demo",
+    "version": "1.0.0",
+    "description": "nodejs demo",
+    "author": "Nikita Ivanov",
+    "main": "app.js",
+    "dependencies": {
+      "express": "^4.16.4"
+    }
+  }
