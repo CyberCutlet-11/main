@@ -1,0 +1,33 @@
+# First, add the Service API
+apiVersion: apps/v1
+# This will be the deployment setup
+kind: Deployment
+metadata:
+  # Name your Deployment here
+  name: app
+  labels:
+    # label your deployment
+    app: app
+spec:
+  # The number of pods/replicas to run
+  replicas: 2            
+  selector:
+    matchLabels:
+    # selector to match the pod
+      app: app
+  template:
+    metadata:
+      labels:
+      # label your pod
+        app: app 
+    spec:
+      containers:
+      # Add the container name for Kubernetes
+      - name: app-node
+      # Add the local image name
+        image: app-node 
+        # never pull the image policy
+        imagePullPolicy: Never
+        ports:
+        # port for running the container
+        - containerPort: 3000 
