@@ -10,9 +10,9 @@ spec:
     # selector that matches the pod
     app: app
   # type of service
-  type: LoadBalancer     
+  type: LoadBalancer
   ports:
-  - protocol: TCP 
+  - protocol: TCP
     # port for exposing the service        
     port: 3001
     # portfor exposing the pod             
