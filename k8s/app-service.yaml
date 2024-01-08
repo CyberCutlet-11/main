@@ -5,6 +5,8 @@ kind: Service
 metadata:
   # Your service name
   name: app-svc
+  annotations:
+    kubernetes.io/elb.id: #Your ELB id
 spec:
   selector:
     # selector that matches the pod
