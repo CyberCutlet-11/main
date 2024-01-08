@@ -27,7 +27,7 @@ spec:
       # Add the local image name
         image: cybercutlet11/app:v1
         # never pull the image policy
-        imagePullPolicy: Never
+        imagePullPolicy: Always
         ports:
         # port for running the container
         - containerPort: 3000
