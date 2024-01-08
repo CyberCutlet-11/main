@@ -42,6 +42,7 @@ data "sbercloud_availability_zones" "list_of_az" {}
 #   value = data.sbercloud_availability_zones.list_of_az.names
 # }
 
+# Get suitable flavors
 data "sbercloud_compute_flavors" "flavors" {
   availability_zone = data.sbercloud_availability_zones.list_of_az.names[0]
   performance_type  = "normal"
@@ -49,13 +50,14 @@ data "sbercloud_compute_flavors" "flavors" {
   memory_size       = 4
 }
 
-# output "all_flavors" {
+# output "suitable_flavors" {
 #   value = data.sbercloud_compute_flavors.flavors.ids
 # }
 
+## Get all compute flavors
 # data "sbercloud_compute_flavors" "all_flavors" {}
 
-# output "all_flavors" {
+# output "all_sbercloud_compute_flavors" {
 #   value = data.sbercloud_compute_flavors.all_flavors.ids
 # }
 
@@ -156,6 +158,19 @@ resource "sbercloud_vpc_eip" "cce_eip" {
   }
 }
 
+resource "sbercloud_vpc_eip" "elb_eip" {
+  publicip {
+    type = "5_bgp"
+  }
+
+  bandwidth {
+    name        = "cce-bandwidth"
+    size        = 4
+    share_type  = "PER"
+    charge_mode = "bandwidth"
+  }
+}
+
 # Create NAT Gateway
 resource "sbercloud_nat_gateway" "nat_gw" {
   name        = "nat-main"
@@ -178,6 +193,17 @@ resource "sbercloud_nat_snat_rule" "snat_subnet_02" {
   floating_ip_id = sbercloud_vpc_eip.nat_eip.id
 }
 
+resource "sbercloud_lb_loadbalancer" "elb_01" {
+  name          = "elb"
+  vip_subnet_id = sbercloud_vpc_subnet.subnet_02.subnet_id
+}
+
+# Attach EIP to ELB
+resource "sbercloud_networking_eip_associate" "elb_eip_associate" {
+  public_ip = sbercloud_vpc_eip.elb_eip.address
+  port_id   = sbercloud_lb_loadbalancer.elb_01.vip_port_id
+}
+
 # Create CCE cluster
 resource "sbercloud_cce_cluster" "cce_01" {
   name                   = "cce-cluster"
@@ -185,7 +211,7 @@ resource "sbercloud_cce_cluster" "cce_01" {
   container_network_type = "overlay_l2"
   multi_az               = true
   vpc_id                 = sbercloud_vpc.vpc_01.id
-  subnet_id              = sbercloud_vpc_subnet.subnet_01.id
+  subnet_id              = sbercloud_vpc_subnet.subnet_02.id
   eip                    = sbercloud_vpc_eip.cce_eip.address
 }
 

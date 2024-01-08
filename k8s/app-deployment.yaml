@@ -25,7 +25,7 @@ spec:
       # Add the container name for Kubernetes
       - name: app-node
       # Add the local image name
-        image: app-node
+        image: cybercutlet11/app:v1
         # never pull the image policy
         imagePullPolicy: Never
         ports:
