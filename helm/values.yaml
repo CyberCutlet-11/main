@@ -1,0 +1,11 @@
+app:
+  image: cybercutlet11/app:latest
+  port: 3000
+  targetPort: 3000
+
+pod:
+  count: 2
+
+sbercloud:
+  elb:
+    id: #Your ELB id
