@@ -35,6 +35,11 @@ provider "sbercloud" {
 
 }
 
+data "sbercloud_images_image" "centos_image" {
+  name = "CentOS 7.6 64bit"
+  most_recent = true
+}
+
 # Get list of AZ
 data "sbercloud_availability_zones" "list_of_az" {}
 
@@ -113,7 +118,7 @@ resource "sbercloud_vpc_subnet" "subnet_02" {
 # Create security group
 resource "sbercloud_networking_secgroup" "sg_01" {
   name        = "sg-main"
-  description = "Security group for HTTP"
+  description = "Security group for HTTP + SSH"
 }
 
 # Create all security group rules
@@ -145,7 +150,7 @@ resource "sbercloud_vpc_eip" "nat_eip" {
   }
 }
 
-resource "sbercloud_vpc_eip" "cce_eip" {
+resource "sbercloud_vpc_eip" "ecs_eip" {
   publicip {
     type = "5_bgp"
   }
@@ -212,7 +217,6 @@ resource "sbercloud_cce_cluster" "cce_01" {
   multi_az               = true
   vpc_id                 = sbercloud_vpc.vpc_01.id
   subnet_id              = sbercloud_vpc_subnet.subnet_02.id
-  eip                    = sbercloud_vpc_eip.cce_eip.address
 }
 
 # Create CCE worker node(s)
@@ -234,4 +238,27 @@ resource "sbercloud_cce_node" "cce_01_node" {
     size       = 100
     volumetype = "SAS"
   }
+}
+
+# Create ECS for Ansible
+resource "sbercloud_compute_instance" "ecs_01" {
+  name              = "terraform-ecs"
+  image_id          = data.sbercloud_images_image.centos_image.id
+  flavor_id         = data.sbercloud_compute_flavors.flavors.ids[0]
+  security_groups   = [sbercloud_networking_secgroup.sg_01.id]
+  availability_zone = data.sbercloud_availability_zones.list_of_az.names[0]
+  admin_pass        = var.password
+
+  system_disk_type = "SAS"
+  system_disk_size = 16
+
+  network {
+    uuid = sbercloud_vpc_subnet.subnet_02.id
+  }
+}
+
+# Attach the EIP to the ECS
+resource "sbercloud_compute_eip_associate" "associated_01" {
+  public_ip   = sbercloud_vpc_eip.ecs_eip.address
+  instance_id = sbercloud_compute_instance.ecs_01.id
 }
