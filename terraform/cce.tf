@@ -13,6 +13,11 @@ variable "password" {
   sensitive = true
 }
 
+variable "my_key" {
+  description = "my_key"
+  sensitive = true
+}
+
 terraform {
   required_providers {
     sbercloud = {
@@ -84,6 +89,12 @@ locals {
       source = "0.0.0.0/0"
     }
   }
+}
+
+#Create key pair
+resource "sbercloud_compute_keypair" "my_keypair" {
+  name       = "my_keypair"
+  public_key = var.my_key
 }
 
 # Create VPC
@@ -227,7 +238,7 @@ resource "sbercloud_cce_node" "cce_01_node" {
   flavor_id         = data.sbercloud_compute_flavors.flavors.ids[0]
   availability_zone = data.sbercloud_availability_zones.list_of_az.names[count.index % local.number_of_az]
   os                = "CentOS 7.6"
-  password           = var.password
+  password          = var.password
 
   root_volume {
     size       = 40
@@ -240,6 +251,11 @@ resource "sbercloud_cce_node" "cce_01_node" {
   }
 }
 
+#Cloud-init file for ECS with Ansible
+data "template_file" "user_data" {
+  template = file("./ansible-ecs-init.yaml")
+}
+
 # Create ECS for Ansible
 resource "sbercloud_compute_instance" "ecs_01" {
   name              = "terraform-ecs"
@@ -248,6 +264,8 @@ resource "sbercloud_compute_instance" "ecs_01" {
   security_groups   = [sbercloud_networking_secgroup.sg_01.id]
   availability_zone = data.sbercloud_availability_zones.list_of_az.names[0]
   admin_pass        = var.password
+  key_pair          = sbercloud_compute_keypair.my_keypair.name
+  user_data         = data.template_file.user_data.rendered
 
   system_disk_type = "SAS"
   system_disk_size = 16
