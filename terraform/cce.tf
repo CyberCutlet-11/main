@@ -256,7 +256,7 @@ data "template_file" "user_data" {
   template = file("./ansible-ecs-init.yaml")
 }
 
-# Create ECS for Ansible
+# Create ECS
 resource "sbercloud_compute_instance" "ecs_01" {
   name              = "terraform-ecs"
   image_id          = data.sbercloud_images_image.centos_image.id
