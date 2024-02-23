@@ -261,7 +261,7 @@ resource "sbercloud_compute_instance" "ecs_01" {
   name              = "terraform-ecs"
   image_id          = data.sbercloud_images_image.centos_image.id
   flavor_id         = data.sbercloud_compute_flavors.flavors.ids[0]
-  security_groups   = [sbercloud_networking_secgroup.sg_01.id]
+  security_groups   = [sbercloud_networking_secgroup.sg_01.name]
   availability_zone = data.sbercloud_availability_zones.list_of_az.names[0]
   admin_pass        = var.password
   key_pair          = sbercloud_compute_keypair.my_keypair.name

@@ -6,7 +6,7 @@ metadata:
   # Your service name
   name: app-svc
   annotations:
-    kubernetes.io/elb.id: {{ .Values.sbercloud.elb.id}}
+    kubernetes.io/elb.id: {{ .Values.sbercloud.elb.id }}
 spec:
   selector:
     # selector that matches the pod
