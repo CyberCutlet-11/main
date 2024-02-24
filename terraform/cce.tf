@@ -253,7 +253,7 @@ resource "sbercloud_cce_node" "cce_01_node" {
 
 #Cloud-init file for ECS with Ansible
 data "template_file" "user_data" {
-  template = file("./ansible-ecs-init.yaml")
+  template = file("./ecs-init.yaml")
 }
 
 # Create ECS

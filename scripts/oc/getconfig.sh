@@ -1,5 +1,5 @@
 #!/bin/bash
-#get configs of currents project
+#get configs of current project
 for n in $(oc get -o=name DaemonSet,Deployment,ReplicaSet,StatefulSet,CronJob,Job,NetworkPolicy,DeploymentConfig,Route,Gateway,VirtualService,DestinationRule,ServiceEntry,Sidecar,EnvoyFilter,ConfigMap,Service)
 do
     project=$(oc project | awk -F '"' '{print $2}')
