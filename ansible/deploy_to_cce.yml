@@ -1,0 +1,23 @@
+---
+- name: Deploy app to remote cloud container engine
+  hosts: 127.0.0.1
+  connection: local
+
+  vars:
+    dst: /home/.kube/
+
+  tasks:
+  - name: Create kube config
+    copy: src={{ source_file }} dest={{ dst }} mode=0555
+
+  - name: Connect to remote CCE
+    shell: kubectl {{ dst }}/config use-context internal
+
+  - name: Clone a github repository
+     git:
+       repo: https://github.com/CyberCutlet-11/main.git
+       dest: /home/repo/
+       clone: yes
+       update: yes
+
+  - shell: helm install app --set sbercloud.elb.id={{ elb_id }} /home/repo/main/helm/
