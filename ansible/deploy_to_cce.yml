@@ -4,20 +4,20 @@
   connection: local
 
   vars:
-    dst: /home/.kube/
+    dst: /root/.kube/
 
   tasks:
   - name: Create kube config
     copy: src={{ source_file }} dest={{ dst }} mode=0555
 
   - name: Connect to remote CCE
-    shell: kubectl {{ dst }}/config use-context internal
+    shell: cd {{ dst }} && kubectl config use-context internal
 
   - name: Clone a github repository
-     git:
-       repo: https://github.com/CyberCutlet-11/main.git
-       dest: /home/repo/
-       clone: yes
-       update: yes
+    git:
+     repo: https://github.com/CyberCutlet-11/main.git
+     dest: /home/repo/
+     clone: yes
+     update: yes
 
-  - shell: helm install app --set sbercloud.elb.id={{ elb_id }} /home/repo/main/helm/
+  - shell: helm install app --set sbercloud.elb.id={{ elb_id }} /home/repo/helm/
