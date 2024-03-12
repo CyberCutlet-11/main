@@ -20,4 +20,12 @@
      clone: yes
      update: yes
 
-  - shell: helm install app --set sbercloud.elb.id={{ elb_id }} /home/repo/helm/
+  - name: Install helm chart
+    kubernetes.core.helm:
+      name: app
+      chart_ref: /home/repo/helm/
+      chart_version: 0.1.0
+      release_namespace: "{{ namespace }}"
+      - set_values:
+        - value: sbercloud.elb.id={{ elb_id }}
+          value_type: string
